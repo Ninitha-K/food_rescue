@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Volunteer Dashboard - AI Surplus Food Redistribution System{% endblock %}
+
+{% block content %}
+<!-- Volunteer Hero Header Card -->
+<div class="hero-header-card hero-volunteer mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <span class="badge bg-white text-dark fw-bold px-3 py-1.5 rounded-pill mb-2 shadow-sm">
+                <i class="fa-solid fa-motorcycle text-amber me-1" style="color:#d97706;"></i> VOLUNTEER HERO PORTAL
+            </span>
+            <h2 class="font-heading fw-extrabold text-white mb-1">{{ volunteer.name }}</h2>
+            <p class="text-white-50 mb-0">
+                <i class="fa-solid fa-motorcycle me-1"></i> Vehicle: <strong>{{ volunteer.vehicle_type }}</strong> (Cap: {{ volunteer.vehicle_capacity }} meals) | 
+                <i class="fa-solid fa-location-dot me-1"></i> Base: {{ volunteer.current_location }} |
+                <i class="fa-solid fa-route me-1"></i> Max Range: {{ volunteer.max_delivery_distance }} km
+            </p>
+        </div>
+        <div>
+            <!-- Prominent LED Availability Status Toggle -->
+            <form action="{{ url_for('toggle_volunteer_availability') }}" method="POST" class="d-inline">
+                {% if volunteer.availability_status == 'AVAILABLE' %}
+                    <button type="submit" class="btn btn-light text-dark fw-bold btn-lg rounded-pill shadow-lg px-4 border border-white">
+                        <span class="pulse-dot pulse-dot-emerald"></span> Status: <span class="text-success fw-extrabold">AVAILABLE & READY</span>
+                    </button>
+                {% else %}
+                    <button type="submit" class="btn btn-dark text-white fw-bold btn-lg rounded-pill shadow-lg px-4 border border-secondary">
+                        <span class="pulse-dot pulse-dot-rose"></span> Status: <span class="text-danger fw-extrabold">UNAVAILABLE (OFF DUTY)</span>
+                    </button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Counter Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Assigned Active Tasks</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ deliveries | length }}</div>
+                    <small class="text-warning fw-semibold"><i class="fa-solid fa-list-check me-1"></i> Active Routing</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-list-check"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Vehicle Capacity Usage</div>
+                    <div class="fs-2 font-heading fw-bold text-primary mb-0">{{ volunteer.vehicle_capacity }} <small class="fs-6 text-muted">meals max</small></div>
+                    <small class="text-info fw-semibold"><i class="fa-solid fa-box me-1"></i> {{ volunteer.vehicle_type }}</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-truck-ramp-box"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Availability Status</div>
+                    <div class="fs-3 font-heading fw-bold mb-0">
+                        {% if volunteer.availability_status == 'AVAILABLE' %}
+                            <span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> ONLINE</span>
+                        {% else %}
+                            <span class="text-danger"><i class="fa-solid fa-circle-pause me-1"></i> OFFLINE</span>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted fw-semibold">Delivery Range: {{ volunteer.max_delivery_distance }} km</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#d1fae5; color:#059669;"><i class="fa-solid fa-signal"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Task List Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+        <h5 class="font-heading fw-bold text-dark mb-0"><i class="fa-solid fa-motorcycle text-warning me-2" style="color:#d97706;"></i> Assigned Food Delivery Tasks</h5>
+        <span class="badge bg-warning text-dark rounded-pill px-3 py-1">{{ deliveries | length }} Active Tasks</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DELIVERY ID</th>
+                        <th>RESTAURANT PICKUP</th>
+                        <th>DESTINATION NGO</th>
+                        <th>FOOD BATCH</th>
+                        <th>QUANTITY</th>
+                        <th>STATUS</th>
+                        <th>ACTION / ADVANCE TASK</th>
+                        <th>TRACKER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for del in deliveries %}
+                        {% set d = del.donation %}
+                        <tr>
+                            <td><strong>#DEL-{{ del.id }}</strong></td>
+                            <td>
+                                <strong>{{ d.restaurant.name }}</strong><br>
+                                <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i> {{ d.pickup_location }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ del.allocation.ngo.name if del.allocation else 'NGO' }}</strong><br>
+                                <small class="text-muted"><i class="fa-solid fa-map-pin me-1"></i> {{ del.allocation.ngo.address if del.allocation else '' }}</small>
+                            </td>
+                            <td><strong>{{ d.food_name }}</strong></td>
+                            <td><span class="badge bg-primary font-heading fw-bold fs-6">{{ d.quantity }} {{ d.unit }}</span></td>
+                            <td>
+                                <span class="badge 
+                                    {% if del.status == 'ASSIGNED' %}bg-primary
+                                    {% elif del.status == 'PICKUP_STARTED' %}bg-info text-dark
+                                    {% elif del.status == 'PICKED_UP' %}bg-warning text-dark
+                                    {% elif del.status == 'IN_TRANSIT' %}bg-secondary
+                                    {% elif del.status == 'NGO_RECEIVED' %}bg-success
+                                    {% elif del.status == 'COMPLETED' %}bg-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ del.status.replace('_', ' ') }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if del.status == 'ASSIGNED' %}
+                                        <form action="{{ url_for('update_delivery_status', delivery_id=del.id) }}" method="POST">
+                                            <input type="hidden" name="status" value="PICKUP_STARTED">
+                                            <button type="submit" class="btn btn-info font-heading fw-bold rounded-pill px-3"><i class="fa-solid fa-play me-1"></i> Start Pickup</button>
+                                        </form>
+                                    {% elif del.status == 'PICKUP_STARTED' %}
+                                        <form action="{{ url_for('update_delivery_status', delivery_id=del.id) }}" method="POST">
+                                            <input type="hidden" name="status" value="PICKED_UP">
+                                            <button type="submit" class="btn btn-warning font-heading fw-bold rounded-pill px-3"><i class="fa-solid fa-box-archive me-1"></i> Confirm Picked Up</button>
+                                        </form>
+                                    {% elif del.status == 'PICKED_UP' %}
+                                        <form action="{{ url_for('update_delivery_status', delivery_id=del.id) }}" method="POST">
+                                            <input type="hidden" name="status" value="IN_TRANSIT">
+                                            <button type="submit" class="btn btn-secondary font-heading fw-bold rounded-pill px-3"><i class="fa-solid fa-truck-fast me-1"></i> Start Transit</button>
+                                        </form>
+                                    {% elif del.status == 'IN_TRANSIT' %}
+                                        <form action="{{ url_for('update_delivery_status', delivery_id=del.id) }}" method="POST">
+                                            <input type="hidden" name="status" value="NGO_RECEIVED">
+                                            <button type="submit" class="btn btn-success font-heading fw-bold rounded-pill px-3"><i class="fa-solid fa-building-circle-check me-1"></i> Delivered at NGO</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge bg-success rounded-pill px-3 py-1.5"><i class="fa-solid fa-check me-1"></i> Delivery Completed</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('delivery_tracking', delivery_id=del.id) }}" class="btn btn-sm btn-outline-dark rounded-pill font-heading fw-bold">
+                                    <i class="fa-solid fa-route me-1"></i> Visual Map
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="8" class="text-center text-muted py-4">No active delivery tasks assigned. Make sure your availability is set to AVAILABLE.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

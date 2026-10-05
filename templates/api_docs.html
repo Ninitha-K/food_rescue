@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}REST API Interoperability Portal - AI Surplus Food System{% endblock %}
+
+{% block full_content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <h2 class="font-heading fw-extrabold text-dark mb-1"><i class="fa-solid fa-network-wired text-primary me-2"></i> REST API Interoperability Portal</h2>
+        <p class="text-secondary lead mb-0">
+            Our platform acts as a normalized interoperability bridge connecting third-party POS systems, NGO relief management tools, and volunteer logistics APIs.
+        </p>
+    </div>
+
+    <!-- Interoperability Flow Card -->
+    <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4 mb-4">
+        <h5 class="font-heading fw-bold text-warning mb-3"><i class="fa-solid fa-diagram-project me-2"></i> Data Normalization & Interoperability Pipeline</h5>
+        <div class="d-flex flex-wrap align-items-center justify-content-between text-center gap-2">
+            <div class="p-3 bg-secondary rounded-3 flex-grow-1">
+                <strong class="text-white">External Restaurant System</strong><br>
+                <small class="text-warning font-monospace"><code>meal_count, expire_in_minutes, address</code></small>
+            </div>
+            <div class="fs-4 text-light"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="p-3 bg-primary rounded-3 flex-grow-1">
+                <strong class="text-white">Flask Normalization Layer</strong><br>
+                <small class="text-light">Schema Mapper & Standardizer</small>
+            </div>
+            <div class="fs-4 text-light"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="p-3 bg-info text-dark rounded-3 flex-grow-1">
+                <strong>AI Decision Engine</strong><br>
+                <small class="text-dark">Feasibility & Compatibility Scorer</small>
+            </div>
+            <div class="fs-4 text-light"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="p-3 bg-success rounded-3 flex-grow-1">
+                <strong class="text-white">NGO & Volunteer Match</strong><br>
+                <small class="text-light">JSON Response & Delivery Creation</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive External API Test Console -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+        <h4 class="font-heading fw-bold text-dark mb-2"><i class="fa-solid fa-vial-circle-check text-success me-2"></i> Live External API Payload Tester Console</h4>
+        <p class="small text-muted mb-3">Simulate an external restaurant POS sending a non-standard JSON payload (e.g. using <code>meal_count</code>, <code>expire_in_minutes</code>, and <code>dish</code>).</p>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">External Request Payload (POST /api/donations)</label>
+                <textarea id="jsonPayload" class="form-control font-monospace bg-light rounded-3" rows="8">{
+  "dish": "External System Surplus Feast",
+  "category": "Cooked",
+  "meal_count": 45,
+  "expire_in_minutes": 75,
+  "address": "Gandhipuram Market Road",
+  "type": "Veg",
+  "description": "API test payload from external partner system"
+}</textarea>
+                <button id="sendApiBtn" onclick="testExternalApiPost()" class="btn btn-primary font-heading fw-bold w-100 mt-2 py-2 rounded-3">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Send External API Request
+                </button>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Normalized API Response & AI Matching Output</label>
+                <pre id="apiResponse" class="p-3 bg-dark text-success rounded-3 font-monospace" style="min-height: 220px; max-height: 320px; overflow-y: auto;">
+Click 'Send External API Request' to test live normalization & AI match...
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Endpoints Reference Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+            <h5 class="font-heading fw-bold text-dark mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i> REST API Endpoints Specification</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>METHOD</th>
+                            <th>ENDPOINT URL</th>
+                            <th>DESCRIPTION</th>
+                            <th>PAYLOAD / OUTPUT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge bg-success">GET</span></td>
+                            <td><code>/api/restaurants</code></td>
+                            <td>Fetch all registered restaurant partners</td>
+                            <td>JSON Array of restaurants</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-success">GET</span></td>
+                            <td><code>/api/restaurants/{id}/surplus</code></td>
+                            <td>Fetch surplus food list for a specific restaurant</td>
+                            <td>Surplus items & statuses</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-success">GET</span></td>
+                            <td><code>/api/ngos</code></td>
+                            <td>Fetch all registered NGOs</td>
+                            <td>NGO details & coordinates</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-success">GET</span></td>
+                            <td><code>/api/ngos/{id}/demand</code></td>
+                            <td>Get current meal demand & max capacity for NGO</td>
+                            <td>Demand & capacity metrics</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-success">GET</span></td>
+                            <td><code>/api/volunteers/available</code></td>
+                            <td>List available volunteers ready for delivery</td>
+                            <td>Available volunteer heroes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-primary">POST</span></td>
+                            <td><code>/api/donations</code></td>
+                            <td>Create donation & trigger Decision Engine (Supports Normalized JSON)</td>
+                            <td>Calculated NGO & Volunteer match</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-primary">POST</span></td>
+                            <td><code>/api/allocations</code></td>
+                            <td>Manually re-run Decision Engine on an existing donation</td>
+                            <td>Feasibility & compatibility score</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-warning text-dark">PUT</span></td>
+                            <td><code>/api/deliveries/{id}/status</code></td>
+                            <td>Update status (<code>PICKUP_STARTED</code>, <code>PICKED_UP</code>, <code>IN_TRANSIT</code>, <code>NGO_RECEIVED</code>, <code>COMPLETED</code>)</td>
+                            <td>Updated delivery timestamp</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function testExternalApiPost() {
+    const payloadStr = document.getElementById('jsonPayload').value;
+    const responseBox = document.getElementById('apiResponse');
+    
+    responseBox.textContent = "Sending request to /api/donations...";
+    
+    try {
+        const payloadJson = JSON.parse(payloadStr);
+        fetch('/api/donations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadJson)
+        })
+        .then(res => res.json())
+        .then(data => {
+            responseBox.textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(err => {
+            responseBox.textContent = "Error executing API call: " + err;
+        });
+    } catch (e) {
+        responseBox.textContent = "Invalid JSON format: " + e.message;
+    }
+}
+</script>
+{% endblock %}

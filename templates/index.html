@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}AI Surplus Food Redistribution Platform{% endblock %}
+
+{% block full_content %}
+<div class="container py-4">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5 g-4">
+        <div class="col-lg-7">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold mb-3">
+                <i class="fa-solid fa-bolt me-1"></i> Time-Critical AI Redistribution Infrastructure
+            </span>
+            <h1 class="display-4 font-heading fw-extrabold text-dark mb-3" style="line-height: 1.15;">
+                AI-Driven Surplus Food <span class="text-primary">Redistribution System</span>
+            </h1>
+            <p class="lead text-secondary mb-4" style="font-size:1.15rem;">
+                Ensuring surplus food reaches suitable beneficiaries <strong>on time before it becomes unsuitable for consumption</strong>. Evaluated by an AI Decision Engine across expiry urgency, NGO capacity, travel distance, and volunteer availability.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm font-heading fw-bold">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i> Role Login Portal
+                </a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-dark btn-lg px-4 rounded-pill font-heading fw-semibold">
+                    <i class="fa-solid fa-user-plus me-2"></i> Join System
+                </a>
+                <a href="{{ url_for('api_docs') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill font-heading fw-semibold">
+                    <i class="fa-solid fa-code me-2"></i> REST API Portal
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg p-4 bg-white rounded-4 border-start border-4 border-primary">
+                <h5 class="font-heading fw-bold text-dark mb-3"><i class="fa-solid fa-route text-primary me-2"></i> End-to-End Lifecycle Flow</h5>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-start">
+                        <div class="badge p-2.5 rounded-3 me-3 text-white" style="background:#059669;"><i class="fa-solid fa-utensils fs-6"></i></div>
+                        <div>
+                            <strong class="text-dark">1. Restaurant Posts Surplus</strong>
+                            <div class="small text-muted">Logs quantity, meal category, prepared time & expiry window.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="badge p-2.5 rounded-3 me-3 text-white" style="background:#4f46e5;"><i class="fa-solid fa-brain fs-6"></i></div>
+                        <div>
+                            <strong class="text-dark">2. AI Decision Engine Evaluates</strong>
+                            <div class="small text-muted">Filters infeasible NGOs & scores compatibility ($25\%$ expiry, $20\%$ demand, $15\%$ capacity, etc.).</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="badge p-2.5 rounded-3 me-3 text-white" style="background:#d97706;"><i class="fa-solid fa-motorcycle fs-6"></i></div>
+                        <div>
+                            <strong class="text-dark">3. Volunteer Assigned</strong>
+                            <div class="small text-muted">Checks vehicle capacity, route travel time & delivery margin.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="badge p-2.5 rounded-3 me-3 text-white" style="background:#0284c7;"><i class="fa-solid fa-heart fs-6"></i></div>
+                        <div>
+                            <strong class="text-dark">4. Timely NGO Distribution</strong>
+                            <div class="small text-muted">Food arrives before expiry & NGO logs beneficiary meals served.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Demo Scenario Benchmark Card (Section 17 Requirement) -->
+    <div class="card border-0 shadow-sm bg-white rounded-4 p-4 mb-4 border border-secondary border-opacity-10">
+        <div class="card-body p-1">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="font-heading fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-flask-vial text-rose me-2" style="color:#f43f5e;"></i> Demo Scenario Benchmark Case (Gandhipuram Evaluation)
+                </h4>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Live AI Decision Result</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold text-primary">Restaurant Donation</span>
+                            <span class="badge bg-primary">50 Meals</span>
+                        </div>
+                        <p class="mb-1 fw-bold text-dark">Gandhipuram Kitchen</p>
+                        <small class="text-danger fw-semibold d-block"><i class="fa-solid fa-clock me-1"></i> Expiry Window: 90 Minutes</small>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i> Gandhipuram Crosscut Road</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border-start border-danger border-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold text-danger">NGO A (Hope Shelter)</span>
+                            <span class="badge bg-danger text-white">NOT FEASIBLE</span>
+                        </div>
+                        <p class="mb-1 text-muted">Distance: 2 km | Demand: 20 | Capacity: 30</p>
+                        <small class="text-danger fw-semibold d-block"><i class="fa-solid fa-xmark me-1"></i> Feasibility Failure: No volunteer available nearby</small>
+                        <small class="text-muted">Demonstrates distance alone is NOT sufficient</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border-start border-success border-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold text-success">NGO B (Care Foundation)</span>
+                            <span class="badge bg-success text-white">FEASIBLE & SELECTED</span>
+                        </div>
+                        <p class="mb-1 text-muted">Distance: 4 km | Demand: 50 | Capacity: 60</p>
+                        <small class="text-success fw-semibold d-block"><i class="fa-solid fa-check me-1"></i> Volunteer Ravi Available (Est. Delivery 28 min)</small>
+                        <small class="text-muted">Selected: Delivery completed well before 90m expiry!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

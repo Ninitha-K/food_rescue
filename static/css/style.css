@@ -1,0 +1,377 @@
+/* ==========================================================================
+   AI Surplus Food Redistribution System - Premium UI Design System
+   Aesthetic: Vibrant, Modern, Glassmorphism, Role-Themed Accents
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --font-primary: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Background Neutral Tokens */
+    --bg-app: #0f172a;
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --border-color: #e2e8f0;
+    
+    /* Role Specific Palette */
+    --admin-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --admin-glow: rgba(79, 70, 229, 0.2);
+    
+    --restaurant-gradient: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+    --restaurant-glow: rgba(5, 150, 105, 0.2);
+    
+    --ngo-gradient: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    --ngo-glow: rgba(2, 132, 199, 0.2);
+    
+    --volunteer-gradient: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+    --volunteer-glow: rgba(217, 119, 6, 0.2);
+    
+    /* Utility Accents */
+    --success-emerald: #10b981;
+    --warning-amber: #f59e0b;
+    --danger-rose: #f43f5e;
+    --info-cyan: #06b6d4;
+    
+    --sidebar-width: 260px;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-main);
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand, .font-heading {
+    font-family: var(--font-primary);
+    letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   NAVBAR & HEADER STYLING
+   -------------------------------------------------------------------------- */
+.navbar-custom {
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.35rem;
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.role-badge-pill {
+    padding: 0.35rem 0.85rem;
+    border-radius: 50rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.role-badge-admin { background: var(--admin-gradient); color: #ffffff; }
+.role-badge-restaurant { background: var(--restaurant-gradient); color: #ffffff; }
+.role-badge-ngo { background: var(--ngo-gradient); color: #ffffff; }
+.role-badge-volunteer { background: var(--volunteer-gradient); color: #ffffff; }
+
+/* --------------------------------------------------------------------------
+   DASHBOARD SIDEBAR & MAIN WRAPPER
+   -------------------------------------------------------------------------- */
+.dashboard-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #0f172a;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .nav-section-title {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    text-transform: uppercase;
+    margin: 1.25rem 0 0.5rem 0.75rem;
+}
+
+.sidebar .nav-link {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.925rem;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar .nav-link i {
+    width: 24px;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #f8fafc;
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: translateX(3px);
+}
+
+.sidebar .nav-link.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    font-weight: 600;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f8fafc;
+    overflow-y: auto;
+}
+
+/* --------------------------------------------------------------------------
+   HERO BANNER & STAT CARDS
+   -------------------------------------------------------------------------- */
+.hero-header-card {
+    border: none;
+    border-radius: 20px;
+    padding: 2rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15);
+}
+
+.hero-admin { background: var(--admin-gradient); }
+.hero-restaurant { background: var(--restaurant-gradient); }
+.hero-ngo { background: var(--ngo-gradient); }
+.hero-volunteer { background: var(--volunteer-gradient); }
+
+.stat-counter-card {
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-color);
+}
+
+.stat-counter-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   DELIVERY TRACKING PIPELINE (8-STAGE TIMELINE)
+   -------------------------------------------------------------------------- */
+.tracking-pipeline-container {
+    padding: 1.5rem 0.5rem;
+    overflow-x: auto;
+}
+
+.tracking-pipeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    min-width: 760px;
+}
+
+.tracking-pipeline::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 45px;
+    right: 45px;
+    height: 4px;
+    background-color: #e2e8f0;
+    z-index: 1;
+}
+
+.pipeline-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    flex: 1;
+}
+
+.pipeline-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 3px solid #cbd5e1;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem auto;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.pipeline-step.completed .pipeline-icon-box {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.pipeline-step.active .pipeline-icon-box {
+    background: #3b82f6;
+    border-color: #60a5fa;
+    color: #ffffff;
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.25);
+    animation: pulseGlow 2s infinite;
+}
+
+.pipeline-title {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 0.15rem;
+}
+
+.pipeline-time {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   ROLE QUICK LOGIN CARDS
+   -------------------------------------------------------------------------- */
+.quick-role-card {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: #ffffff;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.quick-role-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+}
+
+.quick-role-card.admin-card:hover { border-color: #4f46e5; }
+.quick-role-card.restaurant-card:hover { border-color: #059669; }
+.quick-role-card.ngo-card:hover { border-color: #0284c7; }
+.quick-role-card.volunteer-card:hover { border-color: #d97706; }
+
+.quick-role-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    font-size: 1.75rem;
+}
+
+/* Live LED Pulse Indicators */
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.pulse-dot-emerald {
+    background-color: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulseDot 1.8s infinite;
+}
+
+.pulse-dot-amber {
+    background-color: #f59e0b;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    animation: pulseDot 1.8s infinite;
+}
+
+.pulse-dot-rose {
+    background-color: #f43f5e;
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+    animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

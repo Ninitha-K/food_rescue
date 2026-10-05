@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Tracking #DEL-{{ delivery.id }} - AI Surplus Food System{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill mb-2"><i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard</a>
+    <h2 class="font-heading fw-extrabold text-dark"><i class="fa-solid fa-location-crosshairs text-primary me-2"></i> Delivery Lifecycle Tracker #DEL-{{ delivery.id }}</h2>
+    <p class="text-secondary small mb-0">Tracking surplus food item: <strong>{{ delivery.donation.food_name }}</strong> ({{ delivery.donation.quantity }} {{ delivery.donation.unit }})</p>
+</div>
+
+<!-- 8-Stage Visual Timeline Progress Pipeline (Section 10 Requirement) -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <h5 class="font-heading fw-bold text-dark mb-3"><i class="fa-solid fa-timeline text-primary me-2"></i> 8-Stage Real-Time Lifecycle Timeline</h5>
+    <div class="tracking-pipeline-container">
+        <div class="tracking-pipeline">
+            <!-- 1. Food Donated -->
+            <div class="pipeline-step completed">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-utensils"></i></div>
+                <div class="pipeline-title">1. Donated</div>
+                <div class="pipeline-time">{{ delivery.donation.created_at.strftime('%H:%M') if delivery.donation.created_at else 'Done' }}</div>
+            </div>
+
+            <!-- 2. NGO Selected -->
+            <div class="pipeline-step completed">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-building-ngo"></i></div>
+                <div class="pipeline-title">2. NGO Matched</div>
+                <div class="pipeline-time">{{ delivery.allocation.ngo.name if delivery.allocation else 'Matched' }}</div>
+            </div>
+
+            <!-- 3. Volunteer Assigned -->
+            <div class="pipeline-step {% if delivery.status in ['ASSIGNED', 'PICKUP_STARTED', 'PICKED_UP', 'IN_TRANSIT', 'NGO_RECEIVED', 'COMPLETED'] %}completed{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-user-check"></i></div>
+                <div class="pipeline-title">3. Volunteer Assigned</div>
+                <div class="pipeline-time">{{ delivery.volunteer.name }}</div>
+            </div>
+
+            <!-- 4. Pickup Started -->
+            <div class="pipeline-step {% if delivery.status in ['PICKUP_STARTED', 'PICKED_UP', 'IN_TRANSIT', 'NGO_RECEIVED', 'COMPLETED'] %}completed{% elif delivery.status == 'ASSIGNED' %}active{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-person-biking"></i></div>
+                <div class="pipeline-title">4. Pickup Started</div>
+                <div class="pipeline-time">{{ delivery.pickup_started_at.strftime('%H:%M') if delivery.pickup_started_at else 'Pending' }}</div>
+            </div>
+
+            <!-- 5. Food Picked Up -->
+            <div class="pipeline-step {% if delivery.status in ['PICKED_UP', 'IN_TRANSIT', 'NGO_RECEIVED', 'COMPLETED'] %}completed{% elif delivery.status == 'PICKUP_STARTED' %}active{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-box"></i></div>
+                <div class="pipeline-title">5. Food Picked Up</div>
+                <div class="pipeline-time">{{ delivery.picked_up_at.strftime('%H:%M') if delivery.picked_up_at else 'Pending' }}</div>
+            </div>
+
+            <!-- 6. In Transit -->
+            <div class="pipeline-step {% if delivery.status in ['IN_TRANSIT', 'NGO_RECEIVED', 'COMPLETED'] %}completed{% elif delivery.status == 'PICKED_UP' %}active{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-truck-fast"></i></div>
+                <div class="pipeline-title">6. In Transit</div>
+                <div class="pipeline-time">On Route</div>
+            </div>
+
+            <!-- 7. NGO Received -->
+            <div class="pipeline-step {% if delivery.status in ['NGO_RECEIVED', 'COMPLETED'] %}completed{% elif delivery.status == 'IN_TRANSIT' %}active{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-house-circle-check"></i></div>
+                <div class="pipeline-title">7. NGO Received</div>
+                <div class="pipeline-time">{{ delivery.ngo_received_at.strftime('%H:%M') if delivery.ngo_received_at else 'Pending' }}</div>
+            </div>
+
+            <!-- 8. Distributed -->
+            <div class="pipeline-step {% if delivery.donation.status == 'DISTRIBUTED' %}completed{% endif %}">
+                <div class="pipeline-icon-box"><i class="fa-solid fa-heart"></i></div>
+                <div class="pipeline-title">8. Distributed</div>
+                <div class="pipeline-time">Beneficiaries Served</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details & Control Actions Row -->
+<div class="row g-4">
+    <!-- Route & Location Summary Card -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+            <h5 class="font-heading fw-bold text-dark mb-3"><i class="fa-solid fa-circle-info text-primary me-2"></i> Route & Logistics Summary</h5>
+            <table class="table table-borderless table-sm mb-0 align-middle">
+                <tbody>
+                    <tr>
+                        <td class="text-muted fw-semibold" style="width: 35%;">Source Restaurant:</td>
+                        <td class="fw-bold text-dark">{{ delivery.donation.restaurant.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Pickup Address:</td>
+                        <td><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ delivery.donation.pickup_location }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Destination NGO:</td>
+                        <td class="fw-bold text-success">{{ delivery.allocation.ngo.name if delivery.allocation else '' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">NGO Address:</td>
+                        <td><i class="fa-solid fa-map-pin me-1 text-success"></i> {{ delivery.allocation.ngo.address if delivery.allocation else '' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Assigned Volunteer:</td>
+                        <td><strong>{{ delivery.volunteer.name }}</strong> ({{ delivery.volunteer.phone }})</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted fw-semibold">Est. Pickup / Delivery:</td>
+                        <td><span class="badge bg-info-subtle text-info-emphasis border border-info-subtle font-heading fw-bold">{{ delivery.allocation.estimated_pickup_time_minutes }}m pickup / {{ delivery.allocation.estimated_delivery_time_minutes }}m total</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Live Delivery Status Control Card -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <h5 class="font-heading fw-bold text-warning mb-2"><i class="fa-solid fa-sliders me-2"></i> Live Delivery Control</h5>
+            <p class="small text-white-50 mb-3">Advance the delivery status to record timestamps for real-time tracking.</p>
+            
+            <form action="{{ url_for('update_delivery_status', delivery_id=delivery.id) }}" method="POST" class="d-grid gap-2">
+                <button type="submit" name="status" value="PICKUP_STARTED" class="btn btn-outline-light text-start py-2.5 rounded-3 font-heading fw-semibold {% if delivery.status == 'PICKUP_STARTED' %}active bg-primary border-primary text-white{% endif %}">
+                    <i class="fa-solid fa-play me-2 text-info"></i> 1. Start Pickup Movement
+                </button>
+                <button type="submit" name="status" value="PICKED_UP" class="btn btn-outline-light text-start py-2.5 rounded-3 font-heading fw-semibold {% if delivery.status == 'PICKED_UP' %}active bg-warning border-warning text-dark{% endif %}">
+                    <i class="fa-solid fa-box-archive me-2 text-warning"></i> 2. Confirm Food Picked Up
+                </button>
+                <button type="submit" name="status" value="IN_TRANSIT" class="btn btn-outline-light text-start py-2.5 rounded-3 font-heading fw-semibold {% if delivery.status == 'IN_TRANSIT' %}active bg-info border-info text-white{% endif %}">
+                    <i class="fa-solid fa-truck-fast me-2 text-cyan"></i> 3. In Transit to NGO
+                </button>
+                <button type="submit" name="status" value="NGO_RECEIVED" class="btn btn-outline-light text-start py-2.5 rounded-3 font-heading fw-semibold {% if delivery.status == 'NGO_RECEIVED' %}active bg-success border-success text-white{% endif %}">
+                    <i class="fa-solid fa-building-circle-check me-2 text-success"></i> 4. Confirm Delivery Received at NGO
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

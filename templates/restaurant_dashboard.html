@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Restaurant Dashboard - AI Surplus Food Redistribution System{% endblock %}
+
+{% block content %}
+<!-- Restaurant Hero Header Card -->
+<div class="hero-header-card hero-restaurant mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <span class="badge bg-white text-dark fw-bold px-3 py-1.5 rounded-pill mb-2 shadow-sm">
+                <i class="fa-solid fa-utensils text-emerald me-1" style="color:#059669;"></i> RESTAURANT SURPLUS PORTAL
+            </span>
+            <h2 class="font-heading fw-extrabold text-white mb-1">{{ restaurant.name }}</h2>
+            <p class="text-white-50 mb-0"><i class="fa-solid fa-location-dot me-1"></i> {{ restaurant.location }} | <i class="fa-solid fa-phone me-1"></i> {{ restaurant.phone }}</p>
+        </div>
+        <div>
+            <button class="btn btn-light text-emerald fw-bold btn-lg rounded-pill shadow-lg px-4" data-bs-toggle="modal" data-bs-target="#donateFoodModal" style="color:#059669;">
+                <i class="fa-solid fa-plus-circle me-2"></i> Post Surplus Food Donation
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Metrics Banner -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Total Batches Posted</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ donations | length }}</div>
+                    <small class="text-emerald fw-semibold"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Logged Donations</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#d1fae5; color:#059669;"><i class="fa-solid fa-utensils"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Active Allocations</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">
+                        {{ donations | selectattr('status', 'ne', 'DISTRIBUTED') | list | length }}
+                    </div>
+                    <small class="text-info fw-semibold"><i class="fa-solid fa-truck-fast me-1"></i> In Pipeline</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-box-open"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Redistributed Batches</div>
+                    <div class="fs-2 font-heading fw-bold text-success mb-0">
+                        {{ donations | selectattr('status', 'equalto', 'DISTRIBUTED') | list | length }}
+                    </div>
+                    <small class="text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> Zero Wastage</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#dcfce7; color:#15803d;"><i class="fa-solid fa-leaf"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Surplus Food Donations & AI Matching Results -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+        <h5 class="font-heading fw-bold text-dark mb-0"><i class="fa-solid fa-box-open text-emerald me-2" style="color:#059669;"></i> Posted Surplus Food Batches & AI Matches</h5>
+        <span class="badge bg-secondary rounded-pill px-3 py-1">{{ donations | length }} Total Posts</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DONATION ID</th>
+                        <th>FOOD ITEM & DIET</th>
+                        <th>QUANTITY</th>
+                        <th>REMAINING SHELF LIFE</th>
+                        <th>STATUS</th>
+                        <th>MATCHED NGO</th>
+                        <th>ASSIGNED VOLUNTEER</th>
+                        <th>EST. DELIVERY</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in donations %}
+                        <tr>
+                            <td><strong>#DON-{{ d.id }}</strong></td>
+                            <td>
+                                <div><strong>{{ d.food_name }}</strong></div>
+                                <small class="text-muted">
+                                    {{ d.food_category }} | 
+                                    {% if d.is_veg %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Veg</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Non-Veg</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td><span class="badge bg-primary font-heading fw-bold fs-6">{{ d.quantity }} {{ d.unit }}</span></td>
+                            <td>
+                                {% set rem = d.to_dict().remaining_minutes %}
+                                {% if rem <= 30 %}
+                                    <span class="badge bg-danger fw-bold"><i class="fa-solid fa-stopwatch me-1"></i> {{ rem }} mins</span>
+                                {% elif rem <= 90 %}
+                                    <span class="badge bg-warning text-dark fw-bold"><i class="fa-solid fa-clock me-1"></i> {{ rem }} mins</span>
+                                {% else %}
+                                    <span class="badge bg-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> {{ rem }} mins</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if d.status == 'PENDING' %}bg-warning text-dark
+                                    {% elif d.status == 'VOLUNTEER ASSIGNED' %}bg-info text-dark
+                                    {% elif d.status == 'PICKED UP' %}bg-primary
+                                    {% elif d.status == 'IN TRANSIT' %}bg-secondary
+                                    {% elif d.status == 'DELIVERED' %}bg-success
+                                    {% elif d.status == 'DISTRIBUTED' %}bg-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ d.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if d.allocation and d.allocation.ngo %}
+                                    <div><strong>{{ d.allocation.ngo.name }}</strong></div>
+                                    <button type="button" class="btn btn-link p-0 border-0 text-decoration-none small text-success fw-bold" data-bs-toggle="modal" data-bs-target="#scoreBreakdownModal-{{ d.id }}">
+                                        Score: <span class="badge bg-success-subtle text-success border border-success">{{ d.allocation.priority_score }}/100</span> <i class="fa-solid fa-circle-info ms-1"></i>
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted italic small">Evaluating...</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if d.allocation and d.allocation.volunteer %}
+                                    <span class="badge bg-light text-dark border"><i class="fa-solid fa-user me-1 text-primary"></i> {{ d.allocation.volunteer.name }}</span>
+                                {% else %}
+                                    <span class="text-muted small">Pending...</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if d.allocation %}
+                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-bold">
+                                        <i class="fa-solid fa-truck-clock me-1"></i> {{ d.allocation.estimated_delivery_time_minutes }} mins
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">--</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if d.delivery %}
+                                    <a href="{{ url_for('delivery_tracking', delivery_id=d.delivery.id) }}" class="btn btn-sm btn-outline-primary rounded-pill font-heading fw-bold">
+                                        <i class="fa-solid fa-location-crosshairs me-1"></i> Track
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-sm btn-light border rounded-pill" disabled>Pending</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <!-- Modal: AI Decision Engine Score Breakdown -->
+                        {% if d.allocation %}
+                        <div class="modal fade" id="scoreBreakdownModal-{{ d.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content rounded-4 border-0 shadow-lg">
+                                    <div class="modal-header bg-dark text-white">
+                                        <h5 class="modal-title font-heading fw-bold"><i class="fa-solid fa-brain me-2 text-warning"></i> AI Decision Engine Match Analysis</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="p-3 bg-light rounded-3 mb-3 border border-secondary border-opacity-25">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="text-muted small fw-bold">RECOMMENDED NGO MATCH</span>
+                                                    <h5 class="fw-bold text-primary mb-0">{{ d.allocation.ngo.name }}</h5>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="badge bg-success fs-6 rounded-pill px-3 py-1">Score: {{ d.allocation.priority_score }}/100</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold text-dark mb-2">Decision Rationale:</h6>
+                                        <p class="small text-muted mb-3">{{ d.allocation.reason_for_selection }}</p>
+
+                                        <h6 class="fw-bold text-dark mb-2">Matching Parameters:</h6>
+                                        <ul class="list-group list-group-flush small mb-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span>Distance to NGO:</span>
+                                                <strong class="text-dark">Peelamedu (~4.0 km)</strong>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span>NGO Storage Capacity:</span>
+                                                <strong class="text-success">{{ d.allocation.ngo.max_capacity }} Meals (Demand: {{ d.allocation.ngo.current_demand }})</strong>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span>Assigned Volunteer:</span>
+                                                <strong class="text-primary">{{ d.allocation.volunteer.name if d.allocation.volunteer else 'N/A' }}</strong>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span>Estimated Total Delivery Time:</span>
+                                                <strong class="text-danger">{{ d.allocation.estimated_delivery_time_minutes }} mins (Expiry: {{ d.to_dict().remaining_minutes }} mins)</strong>
+                                            </li>
+                                        </ul>
+
+                                        <div class="alert alert-success py-2 px-3 mb-0 small">
+                                            <i class="fa-solid fa-circle-check me-1"></i> Delivery time ({{ d.allocation.estimated_delivery_time_minutes }}m) is well within expiry threshold ({{ d.to_dict().remaining_minutes }}m). FEASIBILITY CONFIRMED.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <tr><td colspan="9" class="text-center text-muted py-4">No surplus food batches posted yet. Click 'Post Surplus Food Donation' above.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Post Surplus Food Donation -->
+<div class="modal fade" id="donateFoodModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header text-white" style="background: var(--restaurant-gradient);">
+                <h5 class="modal-title font-heading fw-bold"><i class="fa-solid fa-utensils me-2"></i> Post Surplus Food Donation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('create_donation') }}" method="POST">
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="food_name" class="form-label fw-semibold">Food Name / Dish Title</label>
+                            <input type="text" class="form-control rounded-3" name="food_name" placeholder="e.g. Fresh Vegetable Rice & Paneer Gravy Meals" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="food_category" class="form-label fw-semibold">Food Category</label>
+                            <select class="form-select rounded-3" name="food_category" required>
+                                <option value="Cooked">Cooked Meals</option>
+                                <option value="Bakery">Bakery / Bread</option>
+                                <option value="Packaged">Packaged Goods</option>
+                                <option value="Raw Produce">Raw Produce / Veggies</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="quantity" class="form-label fw-semibold">Surplus Quantity</label>
+                            <input type="number" class="form-control rounded-3" name="quantity" placeholder="e.g. 50" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="unit" class="form-label fw-semibold">Unit</label>
+                            <select class="form-select rounded-3" name="unit">
+                                <option value="meals">meals</option>
+                                <option value="kg">kg</option>
+                                <option value="boxes">boxes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="expiry_hours" class="form-label fw-semibold">Expiry Window (Hours)</label>
+                            <input type="number" step="0.5" class="form-control rounded-3" name="expiry_hours" value="1.5" min="0.5" max="24" required>
+                            <small class="text-muted">1.5 hours = 90 minutes</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="pickup_location" class="form-label fw-semibold">Pickup Location</label>
+                            <input type="text" class="form-control rounded-3" name="pickup_location" value="{{ restaurant.location }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Dietary Type</label>
+                            <select class="form-select rounded-3" name="is_veg">
+                                <option value="1">Vegetarian</option>
+                                <option value="0">Non-Vegetarian</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label fw-semibold">Handling Notes</label>
+                        <textarea class="form-control rounded-3" name="notes" rows="2" placeholder="Packed in insulated thermal boxes, keep warm..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info border-0 bg-info-subtle text-info-emphasis rounded-3 py-2 px-3 small mb-0">
+                        <i class="fa-solid fa-robot me-1"></i> Submitting this donation automatically triggers the <strong>AI Decision Engine</strong> to rank NGOs & evaluate volunteer feasibility.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn text-white font-heading fw-bold px-4 rounded-pill" style="background: var(--restaurant-gradient);">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Evaluate & Submit Donation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

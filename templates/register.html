@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Register - AI Surplus Food Redistribution System{% endblock %}
+
+{% block full_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <h4 class="font-heading fw-bold mb-1"><i class="fa-solid fa-user-plus me-2"></i> Join the Platform</h4>
+                    <p class="small mb-0 text-white-50">Create an account as a Restaurant, NGO, or Volunteer</p>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('register') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Select User Role</label>
+                            <select class="form-select fw-semibold rounded-3 py-2" name="role" id="roleSelect" onchange="toggleRoleFields()" required>
+                                <option value="" disabled selected>Choose your role...</option>
+                                <option value="restaurant">Restaurant / Commercial Kitchen</option>
+                                <option value="ngo">NGO / Relief Foundation</option>
+                                <option value="volunteer">Delivery Volunteer Hero</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label fw-semibold">Organization / User Name</label>
+                                <input type="text" class="form-control rounded-3 py-2" name="name" placeholder="Name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" class="form-control rounded-3 py-2" name="phone" placeholder="+91 9876543210" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold">Email Address</label>
+                                <input type="email" class="form-control rounded-3 py-2" name="email" placeholder="name@example.com" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label fw-semibold">Password</label>
+                                <input type="password" class="form-control rounded-3 py-2" name="password" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label fw-semibold">Address / Location</label>
+                            <input type="text" class="form-control rounded-3 py-2" name="location" placeholder="e.g. Gandhipuram, Coimbatore" required>
+                        </div>
+
+                        <!-- NGO Specific Fields -->
+                        <div id="ngoFields" class="d-none border p-3 rounded-3 bg-light mb-3">
+                            <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-building-ngo me-1"></i> NGO Profile Details</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small">Current Meal Demand</label>
+                                    <input type="number" class="form-control rounded-3" name="current_demand" value="50">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small">Maximum Meal Capacity</label>
+                                    <input type="number" class="form-control rounded-3" name="max_capacity" value="100">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small">Accepted Food Types</label>
+                                <input type="text" class="form-control rounded-3" name="accepted_food_types" value="Cooked, Bakery, Packaged">
+                            </div>
+                        </div>
+
+                        <!-- Volunteer Specific Fields -->
+                        <div id="volunteerFields" class="d-none border p-3 rounded-3 bg-light mb-3">
+                            <h6 class="fw-bold text-warning mb-2"><i class="fa-solid fa-motorcycle me-1"></i> Volunteer Profile Details</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small">Vehicle Type</label>
+                                    <select class="form-select rounded-3" name="vehicle_type">
+                                        <option value="Motorbike">Motorbike</option>
+                                        <option value="Scooter">Scooter</option>
+                                        <option value="Car">Car</option>
+                                        <option value="Van">Van / Truck</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label small">Vehicle Capacity (Meals)</label>
+                                    <input type="number" class="form-control rounded-3" name="vehicle_capacity" value="60">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100 py-2.5 font-heading fw-bold rounded-3 shadow-sm mt-2">
+                            <i class="fa-solid fa-check-circle me-2"></i> Complete Registration
+                        </button>
+                    </form>
+
+                    <div class="text-center text-muted small mt-4 pt-3 border-top">
+                        Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-primary">Login Here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleRoleFields() {
+    const role = document.getElementById('roleSelect').value;
+    const ngoFields = document.getElementById('ngoFields');
+    const volFields = document.getElementById('volunteerFields');
+
+    ngoFields.classList.add('d-none');
+    volFields.classList.add('d-none');
+
+    if (role === 'ngo') {
+        ngoFields.classList.remove('d-none');
+    } else if (role === 'volunteer') {
+        volFields.classList.remove('d-none');
+    }
+}
+</script>
+{% endblock %}

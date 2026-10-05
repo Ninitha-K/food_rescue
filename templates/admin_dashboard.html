@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Control Center - AI Surplus Food Redistribution System{% endblock %}
+
+{% block content %}
+<!-- Admin Hero Header Card -->
+<div class="hero-header-card hero-admin mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <span class="badge bg-white text-dark fw-bold px-3 py-1.5 rounded-pill mb-2 shadow-sm">
+                <i class="fa-solid fa-crown text-indigo me-1" style="color:#4f46e5;"></i> SYSTEM OVERLOOK CONTROL CENTER
+            </span>
+            <h2 class="font-heading fw-extrabold text-white mb-1">Admin Dashboard & Analytics</h2>
+            <p class="text-white-50 mb-0">Monitor restaurants, NGOs, volunteers, active allocations, and system health in real-time.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur">
+            <span class="pulse-dot pulse-dot-emerald"></span>
+            <div>
+                <div class="text-white fw-bold small">System Status: ACTIVE</div>
+                <small class="text-white-50 fs-8">AI Engine Operational</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Counter Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Restaurants</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ total_restaurants }}</div>
+                    <small class="text-success fw-semibold"><i class="fa-solid fa-check-circle me-1"></i> Registered Partners</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#e0e7ff; color:#4f46e5;">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Registered NGOs</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ total_ngos }}</div>
+                    <small class="text-info fw-semibold"><i class="fa-solid fa-building-ngo me-1"></i> Relief Networks</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#e0f2fe; color:#0284c7;">
+                    <i class="fa-solid fa-building-ngo"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Volunteers</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ total_volunteers }}</div>
+                    <small class="text-warning fw-semibold"><i class="fa-solid fa-person-biking me-1"></i> Active Heroes</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;">
+                    <i class="fa-solid fa-motorcycle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Active Deliveries</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ active_deliveries }}</div>
+                    <small class="text-primary fw-semibold"><i class="fa-solid fa-truck-fast me-1"></i> In Pipeline</small>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#d1fae5; color:#059669;">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approaching Expiry Alert Banner -->
+{% if approaching_expiry %}
+    <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4 p-3" style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-left: 5px solid #f43f5e !important;">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <h5 class="fw-bold text-danger mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i> Food Donations Approaching Expiry (&lt; 60 Minutes)</h5>
+            <span class="badge bg-danger rounded-pill px-3 py-1">{{ approaching_expiry | length }} Urgent Items</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-danger small fw-bold">
+                        <th>DONATION ID</th>
+                        <th>RESTAURANT</th>
+                        <th>FOOD ITEM</th>
+                        <th>QUANTITY</th>
+                        <th>EXPIRY TIME</th>
+                        <th>REMAINING LIFE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in approaching_expiry %}
+                        <tr>
+                            <td><strong>#DON-{{ item.id }}</strong></td>
+                            <td>{{ item.restaurant.name }}</td>
+                            <td><strong>{{ item.food_name }}</strong></td>
+                            <td><span class="badge bg-danger">{{ item.quantity }} {{ item.unit }}</span></td>
+                            <td><small>{{ item.expiry_time.strftime('%H:%M:%S') }}</small></td>
+                            <td>
+                                <span class="badge bg-danger-subtle text-danger border border-danger px-2.5 py-1 font-heading fw-bold">
+                                    <i class="fa-solid fa-stopwatch me-1"></i> {{ item.to_dict().remaining_minutes }} mins
+                                </span>
+                            </td>
+                            <td><span class="badge bg-dark">{{ item.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Visual Analytics & Decision Engine Configuration Preview Section -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Donut Lifecycle Chart -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <h5 class="font-heading fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie text-indigo me-2" style="color:#4f46e5;"></i> Donations by Status</h5>
+            <canvas id="donationsStatusChart" height="220"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: System Performance Metrics -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <h5 class="font-heading fw-bold text-dark mb-3"><i class="fa-solid fa-chart-column text-emerald me-2" style="color:#059669;"></i> Redistribution Impact Metrics</h5>
+            <canvas id="deliveryPerformanceChart" height="220"></canvas>
+        </div>
+    </div>
+
+    <!-- Decision Engine Weights Preview Widget -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-dark text-white h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="font-heading fw-bold text-warning mb-0"><i class="fa-solid fa-sliders me-2"></i> AI Decision Engine Weights</h5>
+                <span class="badge bg-secondary rounded-pill">Backend Config</span>
+            </div>
+            <p class="small text-white-50 mb-3">Weighted criteria used to rank compatible NGOs & volunteers:</p>
+            
+            <div class="d-flex flex-column gap-2 small">
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Expiry Urgency Score</span>
+                        <strong class="text-warning">25%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-warning" style="width: 25%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>NGO Current Demand</span>
+                        <strong class="text-info">20%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-info" style="width: 20%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>NGO Storage Capacity</span>
+                        <strong class="text-success">15%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-success" style="width: 15%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Distance (Restaurant to NGO)</span>
+                        <strong class="text-primary">15%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-primary" style="width: 15%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Food Compatibility & Veg Match</span>
+                        <strong class="text-secondary">10%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-secondary" style="width: 10%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Volunteer Availability & Capacity</span>
+                        <strong class="text-danger">10%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-danger" style="width: 10%"></div></div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>NGO Receiving Window Hours</span>
+                        <strong class="text-light">5%</strong>
+                    </div>
+                    <div class="progress" style="height: 6px;"><div class="progress-bar bg-light" style="width: 5%"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabbed Data Tables Section -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+    <div class="card-header bg-white py-3 border-bottom border-light">
+        <ul class="nav nav-pills card-header-pills gap-2" id="adminTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active font-heading fw-bold rounded-pill px-3 py-2" id="deliveries-tab" data-bs-toggle="tab" data-bs-target="#tab-deliveries">
+                    <i class="fa-solid fa-truck-fast me-1"></i> Active Deliveries ({{ deliveries | length }})
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link font-heading fw-bold rounded-pill px-3 py-2" id="restaurants-tab" data-bs-toggle="tab" data-bs-target="#tab-restaurants">
+                    <i class="fa-solid fa-utensils me-1"></i> Restaurants ({{ restaurants | length }})
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link font-heading fw-bold rounded-pill px-3 py-2" id="ngos-tab" data-bs-toggle="tab" data-bs-target="#tab-ngos">
+                    <i class="fa-solid fa-building-ngo me-1"></i> NGOs ({{ ngos | length }})
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link font-heading fw-bold rounded-pill px-3 py-2" id="users-tab" data-bs-toggle="tab" data-bs-target="#tab-users">
+                    <i class="fa-solid fa-users-gear me-1"></i> User Control ({{ users | length }})
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body p-0 tab-content">
+        <!-- Tab 1: Deliveries -->
+        <div class="tab-pane fade show active" id="tab-deliveries">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>DELIVERY ID</th>
+                            <th>FOOD BATCH</th>
+                            <th>RESTAURANT</th>
+                            <th>DESTINATION NGO</th>
+                            <th>ASSIGNED VOLUNTEER</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for del in deliveries %}
+                            <tr>
+                                <td><strong>#DEL-{{ del.id }}</strong></td>
+                                <td>
+                                    <strong>{{ del.donation.food_name }}</strong><br>
+                                    <small class="text-muted">{{ del.donation.quantity }} {{ del.donation.unit }}</small>
+                                </td>
+                                <td>{{ del.donation.restaurant.name }}</td>
+                                <td>{{ del.allocation.ngo.name }}</td>
+                                <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-user me-1 text-primary"></i> {{ del.volunteer.name }}</span></td>
+                                <td>
+                                    <span class="badge {% if del.status == 'COMPLETED' %}bg-success{% else %}bg-primary{% endif %}">
+                                        {{ del.status.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('delivery_tracking', delivery_id=del.id) }}" class="btn btn-sm btn-outline-primary fw-bold rounded-pill">
+                                        <i class="fa-solid fa-location-crosshairs me-1"></i> Live Tracker
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="7" class="text-center text-muted py-4">No deliveries recorded in the system.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Restaurants -->
+        <div class="tab-pane fade" id="tab-restaurants">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>RESTAURANT NAME</th>
+                            <th>EMAIL</th>
+                            <th>PHONE</th>
+                            <th>LOCATION</th>
+                            <th>DONATIONS POSTED</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in restaurants %}
+                            <tr>
+                                <td>#{{ r.id }}</td>
+                                <td><strong>{{ r.name }}</strong></td>
+                                <td>{{ r.email }}</td>
+                                <td>{{ r.phone }}</td>
+                                <td>{{ r.location }}</td>
+                                <td><span class="badge bg-secondary">{{ r.donations | length }} Posts</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: NGOs -->
+        <div class="tab-pane fade" id="tab-ngos">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>NGO NAME</th>
+                            <th>EMAIL</th>
+                            <th>ADDRESS</th>
+                            <th>CURRENT DEMAND</th>
+                            <th>MAX CAPACITY</th>
+                            <th>HOURS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n in ngos %}
+                            <tr>
+                                <td>#{{ n.id }}</td>
+                                <td><strong>{{ n.name }}</strong></td>
+                                <td>{{ n.email }}</td>
+                                <td>{{ n.address }}</td>
+                                <td><span class="badge bg-warning text-dark">{{ n.current_demand }} meals</span></td>
+                                <td><span class="badge bg-info text-dark">{{ n.max_capacity }} meals</span></td>
+                                <td><small>{{ n.receiving_hours }}</small></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 4: User Account Status Controls -->
+        <div class="tab-pane fade" id="tab-users">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>USER ID</th>
+                            <th>EMAIL</th>
+                            <th>ROLE</th>
+                            <th>ACCOUNT STATUS</th>
+                            <th>ADMIN CONTROL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td>#{{ u.id }}</td>
+                                <td>{{ u.email }}</td>
+                                <td>
+                                    <span class="role-badge-pill role-badge-{{ u.role }}">{{ u.role | upper }}</span>
+                                </td>
+                                <td>
+                                    {% if u.status == 'active' %}
+                                        <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> ACTIVE</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> INACTIVE</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if u.role != 'admin' %}
+                                        <form action="{{ url_for('toggle_user_status', user_id=u.id) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm {% if u.status == 'active' %}btn-outline-danger{% else %}btn-outline-success{% endif %} rounded-pill font-heading fw-bold">
+                                                {% if u.status == 'active' %}<i class="fa-solid fa-user-xmark me-1"></i> Deactivate{% else %}<i class="fa-solid fa-user-check me-1"></i> Activate{% endif %}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted small">System Administrator</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

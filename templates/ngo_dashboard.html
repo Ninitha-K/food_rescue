@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}NGO Dashboard - AI Surplus Food Redistribution System{% endblock %}
+
+{% block content %}
+<!-- NGO Hero Header Card -->
+<div class="hero-header-card hero-ngo mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <span class="badge bg-white text-dark fw-bold px-3 py-1.5 rounded-pill mb-2 shadow-sm">
+                <i class="fa-solid fa-building-ngo text-cyan me-1" style="color:#0284c7;"></i> NGO RELIEF NETWORK PORTAL
+            </span>
+            <h2 class="font-heading fw-extrabold text-white mb-1">{{ ngo.name }}</h2>
+            <p class="text-white-50 mb-0">
+                <i class="fa-solid fa-location-dot me-1"></i> {{ ngo.address }} | 
+                <i class="fa-solid fa-clock me-1"></i> Hours: {{ ngo.receiving_hours }} |
+                <i class="fa-solid fa-utensils me-1"></i> Accepted: {{ ngo.accepted_food_types }}
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-light text-cyan fw-bold btn-lg rounded-pill shadow-lg px-4" data-bs-toggle="modal" data-bs-target="#updateCapacityModal" style="color:#0284c7;">
+                <i class="fa-solid fa-pen-to-square me-2"></i> Update Demand & Capacity
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Demand & Storage Capacity Progress Meters -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Current Meal Demand</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ ngo.current_demand }} <small class="fs-6 text-muted">meals</small></div>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                {% set demand_pct = (ngo.current_demand / ngo.max_capacity * 100) if ngo.max_capacity > 0 else 0 %}
+                <div class="progress-bar bg-warning" style="width: {{ demand_pct }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Max Storage Capacity</div>
+                    <div class="fs-2 font-heading fw-bold text-dark mb-0">{{ ngo.max_capacity }} <small class="fs-6 text-muted">meals</small></div>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-info" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-counter-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="text-muted small font-heading fw-bold text-uppercase">Available Capacity Margin</div>
+                    <div class="fs-2 font-heading fw-bold text-success mb-0">
+                        {{ ngo.max_capacity - ngo.current_demand }} <small class="fs-6 text-muted">meals</small>
+                    </div>
+                </div>
+                <div class="stat-icon-wrapper" style="background:#d1fae5; color:#059669;"><i class="fa-solid fa-chart-pie"></i></div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                {% set margin_pct = ((ngo.max_capacity - ngo.current_demand) / ngo.max_capacity * 100) if ngo.max_capacity > 0 else 0 %}
+                <div class="progress-bar bg-success" style="width: {{ margin_pct }}%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incoming Food Donations -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+        <h5 class="font-heading fw-bold text-dark mb-0"><i class="fa-solid fa-truck-arrow-right text-cyan me-2" style="color:#0284c7;"></i> Incoming Matched Food Allocations</h5>
+        <span class="badge bg-primary rounded-pill px-3 py-1">{{ allocations | length }} Allocated Batches</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DONATION ID</th>
+                        <th>RESTAURANT SOURCE</th>
+                        <th>FOOD ITEM</th>
+                        <th>QUANTITY</th>
+                        <th>ASSIGNED VOLUNTEER</th>
+                        <th>EST. DELIVERY ETA</th>
+                        <th>STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alloc in allocations %}
+                        {% set d = alloc.donation %}
+                        <tr>
+                            <td><strong>#DON-{{ d.id }}</strong></td>
+                            <td>
+                                <strong>{{ d.restaurant.name }}</strong><br>
+                                <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i> {{ d.pickup_location }}</small>
+                            </td>
+                            <td>
+                                <div><strong>{{ d.food_name }}</strong></div>
+                                <small class="text-muted">{{ d.food_category }}</small>
+                            </td>
+                            <td><span class="badge bg-primary font-heading fw-bold fs-6">{{ d.quantity }} {{ d.unit }}</span></td>
+                            <td>
+                                {% if alloc.volunteer %}
+                                    <span class="badge bg-light text-dark border"><i class="fa-solid fa-user me-1 text-primary"></i> {{ alloc.volunteer.name }}</span>
+                                {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-bold">
+                                    <i class="fa-solid fa-clock me-1"></i> {{ alloc.estimated_delivery_time_minutes }} mins
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if d.status == 'DELIVERED' %}bg-success
+                                    {% elif d.status == 'DISTRIBUTED' %}bg-dark
+                                    {% else %}bg-primary{% endif %}">
+                                    {{ d.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if alloc.delivery %}
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('delivery_tracking', delivery_id=alloc.delivery.id) }}" class="btn btn-sm btn-outline-primary rounded-pill font-heading fw-bold">
+                                            <i class="fa-solid fa-location-arrow me-1"></i> Track
+                                        </a>
+                                        {% if d.status != 'DISTRIBUTED' %}
+                                            <button class="btn btn-sm btn-success font-heading fw-bold rounded-pill" data-bs-toggle="modal" data-bs-target="#distributeModal-{{ alloc.delivery.id }}">
+                                                <i class="fa-solid fa-hand-holding-hand me-1"></i> Log Receipt
+                                            </button>
+                                        {% else %}
+                                            <span class="badge bg-secondary rounded-pill">Recorded</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <!-- Modal: Log Distribution Record -->
+                        {% if alloc.delivery %}
+                        <div class="modal fade" id="distributeModal-{{ alloc.delivery.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content rounded-4 border-0 shadow-lg">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title font-heading fw-bold"><i class="fa-solid fa-heart me-2"></i> Confirm Food Receipt & Distribution</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ url_for('ngo_record_distribution', delivery_id=alloc.delivery.id) }}" method="POST">
+                                        <div class="modal-body p-4">
+                                            <p class="small text-muted mb-3">Log the exact quantity received, meals distributed, and beneficiaries served.</p>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Quantity Received</label>
+                                                <input type="number" class="form-control rounded-3" name="quantity_received" value="{{ d.quantity }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Quantity Distributed</label>
+                                                <input type="number" class="form-control rounded-3" name="quantity_distributed" value="{{ d.quantity }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Beneficiaries Served</label>
+                                                <input type="number" class="form-control rounded-3" name="beneficiaries_served" value="{{ d.quantity }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Distribution Notes</label>
+                                                <textarea class="form-control rounded-3" name="notes" rows="2" placeholder="e.g. Distributed to evening shelter residents at central hall."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-light border-0">
+                                            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-success font-heading fw-bold px-4 rounded-pill">
+                                                <i class="fa-solid fa-check me-1"></i> Submit Distribution Record
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <tr><td colspan="8" class="text-center text-muted py-4">No incoming food allocations matched for your NGO currently.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Historical Distribution Log & Beneficiary Impact (Section 11) -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="card-header bg-white py-3 border-bottom border-light">
+        <h5 class="font-heading fw-bold text-dark mb-0"><i class="fa-solid fa-clock-rotate-left text-success me-2"></i> Beneficiary Distribution History Log</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>RECORD ID</th>
+                        <th>FOOD BATCH</th>
+                        <th>MEALS DISTRIBUTED</th>
+                        <th>BENEFICIARIES SERVED</th>
+                        <th>COMPLETED TIMESTAMP</th>
+                        <th>NOTES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in history %}
+                        <tr>
+                            <td><strong>#REC-{{ h.id }}</strong></td>
+                            <td>{{ h.donation.food_name }}</td>
+                            <td><span class="badge bg-success font-heading fw-bold fs-6">{{ h.quantity_distributed }} meals</span></td>
+                            <td><span class="badge bg-info text-dark font-heading fw-bold fs-6">{{ h.beneficiaries_served }} people</span></td>
+                            <td><small class="text-muted">{{ h.distribution_completed_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                            <td><small class="text-muted">{{ h.notes }}</small></td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6" class="text-center text-muted py-4">No historical distribution records logged yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Update Demand & Capacity -->
+<div class="modal fade" id="updateCapacityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title font-heading fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Update Demand & Capacity</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('ngo_update_capacity') }}" method="POST">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="current_demand" class="form-label fw-semibold">Current Meal Demand (Meals)</label>
+                        <input type="number" class="form-control rounded-3" name="current_demand" value="{{ ngo.current_demand }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="max_capacity" class="form-label fw-semibold">Maximum Storage Capacity (Meals)</label>
+                        <input type="number" class="form-control rounded-3" name="max_capacity" value="{{ ngo.max_capacity }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark font-heading fw-bold px-4 rounded-pill">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
